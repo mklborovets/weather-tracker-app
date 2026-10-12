@@ -41,7 +41,6 @@ export interface OpenMeteoForecastResponse {
   };
 }
 
-// Normalized daily item for UI lists
 export interface DailyForecastDay {
   date: string;
   weatherCode: number;
@@ -50,14 +49,13 @@ export interface DailyForecastDay {
   precipitationProbability: number;
 }
 
-// Normalized Weather Data model consumed by UI components and cache
 export interface WeatherData {
   cityId?: number | string;
   cityName?: string;
   latitude: number;
   longitude: number;
   timezone: string;
-  lastUpdated: string; // ISO date string
+  lastUpdated: string;
   current: {
     temperature: number;
     apparentTemperature: number;
