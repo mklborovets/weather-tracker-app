@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useWeather } from '@/hooks/useWeather';
@@ -15,6 +7,9 @@ import { useFavorites } from '@/store/useFavorites';
 import { useSettings } from '@/store/useSettings';
 import { CurrentWeatherView } from '@/components/weather/CurrentWeatherView';
 import { DailyForecastList } from '@/components/weather/DailyForecastList';
+import { WeatherSkeleton } from '@/components/weather/WeatherSkeleton';
+import { ErrorState } from '@/components/ui/ErrorState';
+import { OfflineBanner } from '@/components/ui/OfflineBanner';
 
 export default function CityDetailsScreen() {
   const params = useLocalSearchParams<{
@@ -67,6 +62,8 @@ export default function CityDetailsScreen() {
     }
   };
 
+  const isOfflineData = isError && Boolean(weather);
+
   return (
     <>
       <Stack.Screen
@@ -112,37 +109,25 @@ export default function CityDetailsScreen() {
           />
         }
       >
-        {isLoading && (
-          <View style={styles.stateContainer}>
-            <ActivityIndicator size="large" color="#38bdf8" />
-            <Text style={styles.loadingText}>Loading weather forecast...</Text>
-          </View>
-        )}
+        {isLoading && !weather && <WeatherSkeleton />}
 
-        {isError && (
-          <View style={styles.stateContainer}>
-            <Ionicons
-              name="alert-circle-outline"
-              size={48}
-              color="#f87171"
-              style={styles.errorIcon}
-            />
-            <Text style={styles.errorTitle}>Failed to load forecast</Text>
-            <Text style={styles.errorSubtitle}>
-              {error?.message || 'Please check your connection and try again.'}
-            </Text>
-            <TouchableOpacity
-              style={styles.retryButton}
-              onPress={() => refetch()}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.retryButtonText}>Retry</Text>
-            </TouchableOpacity>
-          </View>
+        {isError && !weather && (
+          <ErrorState
+            title="Failed to Load Forecast"
+            message={
+              error?.message ||
+              'Unable to fetch weather data. Please check your internet connection and try again.'
+            }
+            onRetry={() => refetch()}
+            isRetrying={isRefetching}
+          />
         )}
 
         {weather && (
           <>
+            {isOfflineData && (
+              <OfflineBanner lastUpdated={weather.lastUpdated} onRefresh={() => refetch()} />
+            )}
             <CurrentWeatherView weather={weather} unit={temperatureUnit} />
             <DailyForecastList days={weather.daily} unit={temperatureUnit} />
           </>
@@ -181,42 +166,5 @@ const styles = StyleSheet.create({
   },
   favButton: {
     padding: 4,
-  },
-  stateContainer: {
-    paddingVertical: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loadingText: {
-    marginTop: 16,
-    color: '#94a3b8',
-    fontSize: 16,
-  },
-  errorIcon: {
-    marginBottom: 12,
-  },
-  errorTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#f8fafc',
-    marginBottom: 8,
-  },
-  errorSubtitle: {
-    fontSize: 14,
-    color: '#94a3b8',
-    textAlign: 'center',
-    maxWidth: 280,
-    marginBottom: 20,
-  },
-  retryButton: {
-    backgroundColor: '#38bdf8',
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-  },
-  retryButtonText: {
-    color: '#0f172a',
-    fontSize: 16,
-    fontWeight: '700',
   },
 });
