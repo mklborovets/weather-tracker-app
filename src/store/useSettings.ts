@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { safeAsyncStorage } from './storage';
 
 export type TemperatureUnit = 'celsius' | 'fahrenheit';
 export type ThemeMode = 'system' | 'light' | 'dark';
@@ -30,7 +30,7 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: 'weather-tracker-settings',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => safeAsyncStorage),
     },
   ),
 );

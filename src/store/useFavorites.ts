@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { safeAsyncStorage } from './storage';
 import { FavoriteCity } from '@/types/favorites';
 
 interface FavoritesState {
@@ -35,7 +35,7 @@ export const useFavorites = create<FavoritesState>()(
     }),
     {
       name: 'weather-tracker-favorites',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => safeAsyncStorage),
     },
   ),
 );
