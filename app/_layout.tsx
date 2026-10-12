@@ -36,7 +36,6 @@ function RootNavigation() {
           name="city/[id]"
           options={{
             title: 'Forecast',
-            headerBackTitle: 'Back',
           }}
         />
       </Stack>

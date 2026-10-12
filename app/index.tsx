@@ -14,8 +14,8 @@ import { Stack, useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { CitySearch } from '@/components/weather/CitySearch';
 import { FavoriteCityCard } from '@/components/weather/FavoriteCityCard';
+import { HeaderControls } from '@/components/ui/HeaderControls';
 import { useFavorites } from '@/store/useFavorites';
-import { useSettings } from '@/store/useSettings';
 import { useLocation } from '@/hooks/useLocation';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { queryClient } from '@/api/queryClient';
@@ -24,9 +24,8 @@ import { FavoriteCity } from '@/types/favorites';
 export default function HomeScreen() {
   const router = useRouter();
   const { favorites, removeFavorite } = useFavorites();
-  const { temperatureUnit, toggleTemperatureUnit } = useSettings();
   const { getCurrentLocation, isLocating } = useLocation();
-  const { colors, isDark, toggleTheme } = useThemeColors();
+  const { colors } = useThemeColors();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleCityPress = (city: FavoriteCity) => {
@@ -74,39 +73,7 @@ export default function HomeScreen() {
       <Stack.Screen
         options={{
           title: 'Weather Tracker',
-          headerRight: () => (
-            <View style={styles.headerRightButtons}>
-              <TouchableOpacity
-                onPress={toggleTheme}
-                style={[
-                  styles.iconButton,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                ]}
-                activeOpacity={0.7}
-                accessibilityLabel="Toggle dark/light theme"
-              >
-                <Ionicons
-                  name={isDark ? 'sunny-outline' : 'moon-outline'}
-                  size={18}
-                  color={colors.accent}
-                />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={toggleTemperatureUnit}
-                style={[
-                  styles.unitButton,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                ]}
-                activeOpacity={0.7}
-                accessibilityLabel="Toggle temperature unit"
-              >
-                <Text style={[styles.unitText, { color: colors.textPrimary }]}>
-                  {temperatureUnit === 'celsius' ? '°C' : '°F'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          ),
+          headerRight: () => <HeaderControls />,
         }}
       />
 
@@ -194,29 +161,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
   },
-  headerRightButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  iconButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 8,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  unitButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  unitText: {
-    fontSize: 14,
-    fontWeight: '700',
-  },
+
   searchSection: {
     marginBottom: 20,
     zIndex: 20,

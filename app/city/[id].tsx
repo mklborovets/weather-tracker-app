@@ -1,5 +1,5 @@
 import React from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useWeather } from '@/hooks/useWeather';
@@ -11,6 +11,8 @@ import { DailyForecastList } from '@/components/weather/DailyForecastList';
 import { WeatherSkeleton } from '@/components/weather/WeatherSkeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { OfflineBanner } from '@/components/ui/OfflineBanner';
+import { BackButton } from '@/components/ui/BackButton';
+import { HeaderControls } from '@/components/ui/HeaderControls';
 
 export default function CityDetailsScreen() {
   const params = useLocalSearchParams<{
@@ -29,9 +31,9 @@ export default function CityDetailsScreen() {
   const country = params.country;
   const admin1 = params.admin1;
 
-  const { temperatureUnit, toggleTemperatureUnit } = useSettings();
+  const { temperatureUnit } = useSettings();
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
-  const { colors, isDark, toggleTheme } = useThemeColors();
+  const { colors } = useThemeColors();
 
   const isFav = isFavorite(cityId);
 
@@ -75,47 +77,26 @@ export default function CityDetailsScreen() {
             backgroundColor: colors.background,
           },
           headerTintColor: colors.textPrimary,
+          headerLeft: () => <BackButton />,
           headerRight: () => (
-            <View style={styles.headerButtons}>
-              <TouchableOpacity
-                onPress={toggleTheme}
-                style={[
-                  styles.iconButton,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                ]}
-                activeOpacity={0.7}
-                accessibilityLabel="Toggle dark/light theme"
-              >
-                <Ionicons
-                  name={isDark ? 'sunny-outline' : 'moon-outline'}
-                  size={18}
-                  color={colors.accent}
-                />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={toggleTemperatureUnit}
-                style={[
-                  styles.unitButton,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                ]}
-                activeOpacity={0.7}
-                accessibilityLabel="Toggle temperature unit"
-              >
-                <Text style={[styles.unitText, { color: colors.textPrimary }]}>
-                  {temperatureUnit === 'celsius' ? '°C' : '°F'}
-                </Text>
-              </TouchableOpacity>
-
+            <View style={styles.headerRightContainer}>
+              <HeaderControls />
               <TouchableOpacity
                 onPress={handleToggleFavorite}
-                style={styles.favButton}
+                style={[
+                  styles.favButton,
+                  {
+                    backgroundColor: colors.card,
+                    borderColor: isFav ? colors.danger : colors.border,
+                  },
+                ]}
                 activeOpacity={0.7}
+                accessibilityRole="button"
                 accessibilityLabel={isFav ? 'Remove from favorites' : 'Add to favorites'}
               >
                 <Ionicons
                   name={isFav ? 'heart' : 'heart-outline'}
-                  size={22}
+                  size={19}
                   color={isFav ? colors.danger : colors.textMuted}
                 />
               </TouchableOpacity>
@@ -172,30 +153,17 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 40,
   },
-  headerButtons: {
+  headerRightContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  iconButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+  favButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  unitButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  unitText: {
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  favButton: {
-    padding: 4,
   },
 });
