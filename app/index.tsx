@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Keyboard,
   RefreshControl,
@@ -15,6 +16,7 @@ import { CitySearch } from '@/components/weather/CitySearch';
 import { FavoriteCityCard } from '@/components/weather/FavoriteCityCard';
 import { useFavorites } from '@/store/useFavorites';
 import { useSettings } from '@/store/useSettings';
+import { useLocation } from '@/hooks/useLocation';
 import { queryClient } from '@/api/queryClient';
 import { FavoriteCity } from '@/types/favorites';
 
@@ -22,6 +24,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const { favorites, removeFavorite } = useFavorites();
   const { temperatureUnit, toggleTemperatureUnit } = useSettings();
+  const { getCurrentLocation, isLocating } = useLocation();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleCityPress = (city: FavoriteCity) => {
@@ -36,6 +39,23 @@ export default function HomeScreen() {
         admin1: city.admin1 ?? '',
       },
     });
+  };
+
+  const handleLocationPress = async () => {
+    const loc = await getCurrentLocation();
+    if (loc) {
+      router.push({
+        pathname: '/city/[id]',
+        params: {
+          id: `loc_${loc.latitude.toFixed(3)}_${loc.longitude.toFixed(3)}`,
+          name: loc.cityName,
+          latitude: String(loc.latitude),
+          longitude: String(loc.longitude),
+          country: loc.country ?? '',
+          admin1: loc.admin1 ?? '',
+        },
+      });
+    }
   };
 
   const handleRefresh = async () => {
@@ -68,7 +88,24 @@ export default function HomeScreen() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.container}>
           <View style={styles.searchSection}>
-            <CitySearch placeholder="Search city (e.g. Kyiv, London)..." />
+            <View style={styles.searchRow}>
+              <View style={styles.searchInputContainer}>
+                <CitySearch placeholder="Search city (e.g. Kyiv, London)..." />
+              </View>
+              <TouchableOpacity
+                style={styles.locationButton}
+                onPress={handleLocationPress}
+                disabled={isLocating}
+                activeOpacity={0.7}
+                accessibilityLabel="My current location"
+              >
+                {isLocating ? (
+                  <ActivityIndicator size="small" color="#38bdf8" />
+                ) : (
+                  <Ionicons name="navigate-outline" size={20} color="#38bdf8" />
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.sectionHeader}>
@@ -87,8 +124,8 @@ export default function HomeScreen() {
               </View>
               <Text style={styles.emptyTitle}>No saved cities yet</Text>
               <Text style={styles.emptySubtitle}>
-                Search for a city above and tap the heart icon to add it to your favorites for quick
-                access.
+                Search for a city above or tap the location button to view weather forecasts and
+                save your favorite places.
               </Text>
             </View>
           ) : (
@@ -139,6 +176,24 @@ const styles = StyleSheet.create({
   searchSection: {
     marginBottom: 20,
     zIndex: 20,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  searchInputContainer: {
+    flex: 1,
+  },
+  locationButton: {
+    backgroundColor: '#1e293b',
+    width: 50,
+    height: 50,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#334155',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sectionHeader: {
     flexDirection: 'row',
