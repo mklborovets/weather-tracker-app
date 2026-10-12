@@ -1,6 +1,10 @@
 {
   "extends": ["expo", "prettier"],
   "plugins": ["prettier"],
+  "env": {
+    "jest": true,
+    "node": true
+  },
   "rules": {
     "prettier/prettier": "warn",
     "@typescript-eslint/no-explicit-any": "error"
