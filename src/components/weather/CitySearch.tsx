@@ -5,6 +5,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Input } from '@/components/ui/Input';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCitySearch } from '@/hooks/useCitySearch';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import { GeocodingResult } from '@/types/geocoding';
 
 export interface CitySearchProps {
@@ -17,6 +18,7 @@ export function CitySearch({
   placeholder = 'Search for a city...',
 }: CitySearchProps) {
   const router = useRouter();
+  const { colors } = useThemeColors();
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 400);
 
@@ -56,19 +58,38 @@ export function CitySearch({
       />
 
       {isError && hasSearchText && (
-        <View style={styles.feedbackContainer}>
-          <Text style={styles.errorText}>Unable to search cities. Please check your network.</Text>
+        <View
+          style={[
+            styles.feedbackContainer,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.errorText, { color: colors.danger }]}>
+            Unable to search cities. Please check your network.
+          </Text>
         </View>
       )}
 
       {showEmptyState && (
-        <View style={styles.feedbackContainer}>
-          <Text style={styles.emptyText}>No cities found for &quot;{debouncedQuery}&quot;</Text>
+        <View
+          style={[
+            styles.feedbackContainer,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+            No cities found for &quot;{debouncedQuery}&quot;
+          </Text>
         </View>
       )}
 
       {isSearching && results && results.length > 0 && (
-        <View style={styles.resultsWrapper}>
+        <View
+          style={[
+            styles.resultsWrapper,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
           <FlatList
             data={results}
             keyExtractor={(item) => String(item.id)}
@@ -80,15 +101,17 @@ export function CitySearch({
                 activeOpacity={0.7}
               >
                 <View style={styles.resultTextContainer}>
-                  <Text style={styles.cityName}>{item.name}</Text>
-                  <Text style={styles.cityDetails}>
+                  <Text style={[styles.cityName, { color: colors.textPrimary }]}>{item.name}</Text>
+                  <Text style={[styles.cityDetails, { color: colors.textSecondary }]}>
                     {[item.admin1, item.country].filter(Boolean).join(', ')}
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#64748b" />
+                <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
               </TouchableOpacity>
             )}
-            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            ItemSeparatorComponent={() => (
+              <View style={[styles.separator, { backgroundColor: colors.border }]} />
+            )}
             style={styles.resultsList}
           />
         </View>
@@ -105,27 +128,21 @@ const styles = StyleSheet.create({
   feedbackContainer: {
     marginTop: 8,
     padding: 12,
-    backgroundColor: '#1e293b',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#334155',
   },
   errorText: {
-    color: '#f87171',
     fontSize: 14,
     textAlign: 'center',
   },
   emptyText: {
-    color: '#94a3b8',
     fontSize: 14,
     textAlign: 'center',
   },
   resultsWrapper: {
     marginTop: 8,
-    backgroundColor: '#1e293b',
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#334155',
     maxHeight: 280,
     overflow: 'hidden',
   },
@@ -146,19 +163,12 @@ const styles = StyleSheet.create({
   cityName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#f8fafc',
     marginBottom: 2,
   },
   cityDetails: {
     fontSize: 13,
-    color: '#94a3b8',
-  },
-  arrowIcon: {
-    fontSize: 20,
-    color: '#64748b',
   },
   separator: {
     height: 1,
-    backgroundColor: '#334155',
   },
 });

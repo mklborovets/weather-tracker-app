@@ -4,6 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { FavoriteCity } from '@/types/favorites';
 import { useWeather } from '@/hooks/useWeather';
 import { useSettings } from '@/store/useSettings';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import { getWeatherInfo } from '@/utils/weatherCodes';
 import { formatTemperature } from '@/utils/formatters';
 
@@ -15,6 +16,7 @@ export interface FavoriteCityCardProps {
 
 export function FavoriteCityCard({ city, onPress, onRemove }: FavoriteCityCardProps) {
   const { temperatureUnit } = useSettings();
+  const { colors } = useThemeColors();
 
   const {
     data: weather,
@@ -32,23 +34,26 @@ export function FavoriteCityCard({ city, onPress, onRemove }: FavoriteCityCardPr
 
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
       onPress={() => onPress(city)}
       activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityLabel={`Weather for ${city.name}`}
     >
       <View style={styles.leftContainer}>
-        <Text style={styles.cityName} numberOfLines={1}>
+        <Text style={[styles.cityName, { color: colors.textPrimary }]} numberOfLines={1}>
           {city.name}
         </Text>
         {locationSubtitle ? (
-          <Text style={styles.locationSubtitle} numberOfLines={1}>
+          <Text
+            style={[styles.locationSubtitle, { color: colors.textSecondary }]}
+            numberOfLines={1}
+          >
             {locationSubtitle}
           </Text>
         ) : null}
         {condition ? (
-          <Text style={styles.conditionText} numberOfLines={1}>
+          <Text style={[styles.conditionText, { color: colors.accent }]} numberOfLines={1}>
             {condition.label}
           </Text>
         ) : null}
@@ -56,16 +61,18 @@ export function FavoriteCityCard({ city, onPress, onRemove }: FavoriteCityCardPr
 
       <View style={styles.rightContainer}>
         <View style={styles.weatherInfo}>
-          {isLoading && <ActivityIndicator size="small" color="#38bdf8" style={styles.loader} />}
+          {isLoading && (
+            <ActivityIndicator size="small" color={colors.accent} style={styles.loader} />
+          )}
 
           {isError && !weather && (
-            <Ionicons name="cloud-offline-outline" size={24} color="#64748b" />
+            <Ionicons name="cloud-offline-outline" size={24} color={colors.textMuted} />
           )}
 
           {weather && condition && (
             <View style={styles.weatherData}>
               <Ionicons name={condition.iconName} size={26} color={condition.iconColor} />
-              <Text style={styles.temperature}>
+              <Text style={[styles.temperature, { color: colors.textPrimary }]}>
                 {formatTemperature(weather.current.temperature, temperatureUnit)}
               </Text>
             </View>
@@ -73,12 +80,18 @@ export function FavoriteCityCard({ city, onPress, onRemove }: FavoriteCityCardPr
         </View>
 
         <TouchableOpacity
-          style={styles.removeButton}
+          style={[
+            styles.removeButton,
+            {
+              backgroundColor: colors.cardSecondary,
+              borderColor: colors.border,
+            },
+          ]}
           onPress={() => onRemove(city.id)}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           accessibilityLabel={`Remove ${city.name} from favorites`}
         >
-          <Ionicons name="trash-outline" size={18} color="#94a3b8" />
+          <Ionicons name="trash-outline" size={18} color={colors.textMuted} />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -87,12 +100,10 @@ export function FavoriteCityCard({ city, onPress, onRemove }: FavoriteCityCardPr
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#1e293b',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#334155',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -104,17 +115,14 @@ const styles = StyleSheet.create({
   cityName: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#f8fafc',
     marginBottom: 2,
   },
   locationSubtitle: {
     fontSize: 13,
-    color: '#94a3b8',
     marginBottom: 4,
   },
   conditionText: {
     fontSize: 13,
-    color: '#38bdf8',
     fontWeight: '500',
   },
   rightContainer: {
@@ -134,7 +142,6 @@ const styles = StyleSheet.create({
   temperature: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#f8fafc',
   },
   loader: {
     paddingVertical: 4,
@@ -142,8 +149,6 @@ const styles = StyleSheet.create({
   removeButton: {
     padding: 6,
     borderRadius: 8,
-    backgroundColor: '#0f172a',
     borderWidth: 1,
-    borderColor: '#334155',
   },
 });

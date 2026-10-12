@@ -17,6 +17,7 @@ import { FavoriteCityCard } from '@/components/weather/FavoriteCityCard';
 import { useFavorites } from '@/store/useFavorites';
 import { useSettings } from '@/store/useSettings';
 import { useLocation } from '@/hooks/useLocation';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import { queryClient } from '@/api/queryClient';
 import { FavoriteCity } from '@/types/favorites';
 
@@ -25,6 +26,7 @@ export default function HomeScreen() {
   const { favorites, removeFavorite } = useFavorites();
   const { temperatureUnit, toggleTemperatureUnit } = useSettings();
   const { getCurrentLocation, isLocating } = useLocation();
+  const { colors, isDark, toggleTheme } = useThemeColors();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleCityPress = (city: FavoriteCity) => {
@@ -73,57 +75,90 @@ export default function HomeScreen() {
         options={{
           title: 'Weather Tracker',
           headerRight: () => (
-            <TouchableOpacity
-              onPress={toggleTemperatureUnit}
-              style={styles.unitButton}
-              activeOpacity={0.7}
-              accessibilityLabel="Toggle temperature unit"
-            >
-              <Text style={styles.unitText}>{temperatureUnit === 'celsius' ? '°C' : '°F'}</Text>
-            </TouchableOpacity>
+            <View style={styles.headerRightButtons}>
+              <TouchableOpacity
+                onPress={toggleTheme}
+                style={[
+                  styles.iconButton,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+                activeOpacity={0.7}
+                accessibilityLabel="Toggle dark/light theme"
+              >
+                <Ionicons
+                  name={isDark ? 'sunny-outline' : 'moon-outline'}
+                  size={18}
+                  color={colors.accent}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={toggleTemperatureUnit}
+                style={[
+                  styles.unitButton,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+                activeOpacity={0.7}
+                accessibilityLabel="Toggle temperature unit"
+              >
+                <Text style={[styles.unitText, { color: colors.textPrimary }]}>
+                  {temperatureUnit === 'celsius' ? '°C' : '°F'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           ),
         }}
       />
 
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
           <View style={styles.searchSection}>
             <View style={styles.searchRow}>
               <View style={styles.searchInputContainer}>
                 <CitySearch placeholder="Search city (e.g. Kyiv, London)..." />
               </View>
               <TouchableOpacity
-                style={styles.locationButton}
+                style={[
+                  styles.locationButton,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
                 onPress={handleLocationPress}
                 disabled={isLocating}
                 activeOpacity={0.7}
                 accessibilityLabel="My current location"
               >
                 {isLocating ? (
-                  <ActivityIndicator size="small" color="#38bdf8" />
+                  <ActivityIndicator size="small" color={colors.accent} />
                 ) : (
-                  <Ionicons name="navigate-outline" size={20} color="#38bdf8" />
+                  <Ionicons name="navigate-outline" size={20} color={colors.accent} />
                 )}
               </TouchableOpacity>
             </View>
           </View>
 
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Saved Cities</Text>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Saved Cities</Text>
             {favorites.length > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{favorites.length}</Text>
+              <View style={[styles.badge, { backgroundColor: colors.card }]}>
+                <Text style={[styles.badgeText, { color: colors.accent }]}>{favorites.length}</Text>
               </View>
             )}
           </View>
 
           {favorites.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <View style={styles.emptyIconCircle}>
-                <Ionicons name="heart-outline" size={32} color="#64748b" />
+              <View
+                style={[
+                  styles.emptyIconCircle,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+              >
+                <Ionicons name="heart-outline" size={32} color={colors.textMuted} />
               </View>
-              <Text style={styles.emptyTitle}>No saved cities yet</Text>
-              <Text style={styles.emptySubtitle}>
+              <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
+                No saved cities yet
+              </Text>
+              <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
                 Search for a city above or tap the location button to view weather forecasts and
                 save your favorite places.
               </Text>
@@ -141,8 +176,8 @@ export default function HomeScreen() {
                 <RefreshControl
                   refreshing={isRefreshing}
                   onRefresh={handleRefresh}
-                  tintColor="#38bdf8"
-                  colors={['#38bdf8']}
+                  tintColor={colors.accent}
+                  colors={[colors.accent]}
                 />
               }
             />
@@ -158,18 +193,27 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
-    backgroundColor: '#0f172a',
+  },
+  headerRightButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  iconButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   unitButton: {
-    backgroundColor: '#334155',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#475569',
   },
   unitText: {
-    color: '#f8fafc',
     fontSize: 14,
     fontWeight: '700',
   },
@@ -186,12 +230,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   locationButton: {
-    backgroundColor: '#1e293b',
     width: 50,
     height: 50,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#334155',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -204,10 +246,8 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#f8fafc',
   },
   badge: {
-    backgroundColor: '#334155',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
@@ -215,7 +255,6 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#38bdf8',
   },
   emptyContainer: {
     flex: 1,
@@ -228,9 +267,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#1e293b',
     borderWidth: 1,
-    borderColor: '#334155',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -238,12 +275,10 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#f8fafc',
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: '#94a3b8',
     textAlign: 'center',
     lineHeight: 20,
   },

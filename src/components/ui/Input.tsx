@@ -10,6 +10,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 export interface InputProps extends TextInputProps {
   onClear?: () => void;
@@ -27,30 +28,39 @@ export function Input({
   style,
   ...props
 }: InputProps) {
+  const { colors } = useThemeColors();
   const showClear = Boolean(value && value.length > 0 && onClear);
 
   return (
-    <View style={[styles.container, containerStyle]}>
-      <Ionicons name="search" size={18} color="#94a3b8" style={styles.searchIcon} />
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.card, borderColor: colors.border },
+        containerStyle,
+      ]}
+    >
+      <Ionicons name="search" size={18} color={colors.textMuted} style={styles.searchIcon} />
       <TextInput
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor="#64748b"
-        style={[styles.input, style]}
+        placeholderTextColor={colors.textMuted}
+        style={[styles.input, { color: colors.textPrimary }, style]}
         autoCorrect={false}
         autoCapitalize="none"
         {...props}
       />
-      {isLoading && <ActivityIndicator size="small" color="#38bdf8" style={styles.indicator} />}
+      {isLoading && (
+        <ActivityIndicator size="small" color={colors.accent} style={styles.indicator} />
+      )}
       {showClear && !isLoading && (
         <TouchableOpacity
           onPress={onClear}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={styles.clearButton}
+          style={[styles.clearButton, { backgroundColor: colors.cardSecondary }]}
           accessibilityLabel="Clear text"
         >
-          <Ionicons name="close" size={14} color="#94a3b8" />
+          <Ionicons name="close" size={14} color={colors.textMuted} />
         </TouchableOpacity>
       )}
     </View>
@@ -61,10 +71,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1e293b',
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#334155',
     paddingHorizontal: 14,
     height: 50,
   },
@@ -73,7 +81,6 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: '#f8fafc',
     fontSize: 16,
     paddingVertical: 0,
   },
@@ -84,7 +91,6 @@ const styles = StyleSheet.create({
     padding: 3,
     marginLeft: 6,
     borderRadius: 12,
-    backgroundColor: '#334155',
     width: 22,
     height: 22,
     alignItems: 'center',

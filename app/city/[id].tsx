@@ -5,6 +5,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useWeather } from '@/hooks/useWeather';
 import { useFavorites } from '@/store/useFavorites';
 import { useSettings } from '@/store/useSettings';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import { CurrentWeatherView } from '@/components/weather/CurrentWeatherView';
 import { DailyForecastList } from '@/components/weather/DailyForecastList';
 import { WeatherSkeleton } from '@/components/weather/WeatherSkeleton';
@@ -30,6 +31,7 @@ export default function CityDetailsScreen() {
 
   const { temperatureUnit, toggleTemperatureUnit } = useSettings();
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
+  const { colors, isDark, toggleTheme } = useThemeColors();
 
   const isFav = isFavorite(cityId);
 
@@ -69,15 +71,40 @@ export default function CityDetailsScreen() {
       <Stack.Screen
         options={{
           title: cityName,
+          headerStyle: {
+            backgroundColor: colors.background,
+          },
+          headerTintColor: colors.textPrimary,
           headerRight: () => (
             <View style={styles.headerButtons}>
               <TouchableOpacity
+                onPress={toggleTheme}
+                style={[
+                  styles.iconButton,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+                activeOpacity={0.7}
+                accessibilityLabel="Toggle dark/light theme"
+              >
+                <Ionicons
+                  name={isDark ? 'sunny-outline' : 'moon-outline'}
+                  size={18}
+                  color={colors.accent}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
                 onPress={toggleTemperatureUnit}
-                style={styles.unitButton}
+                style={[
+                  styles.unitButton,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
                 activeOpacity={0.7}
                 accessibilityLabel="Toggle temperature unit"
               >
-                <Text style={styles.unitText}>{temperatureUnit === 'celsius' ? '°C' : '°F'}</Text>
+                <Text style={[styles.unitText, { color: colors.textPrimary }]}>
+                  {temperatureUnit === 'celsius' ? '°C' : '°F'}
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -89,7 +116,7 @@ export default function CityDetailsScreen() {
                 <Ionicons
                   name={isFav ? 'heart' : 'heart-outline'}
                   size={22}
-                  color={isFav ? '#f43f5e' : '#cbd5e1'}
+                  color={isFav ? colors.danger : colors.textMuted}
                 />
               </TouchableOpacity>
             </View>
@@ -98,14 +125,14 @@ export default function CityDetailsScreen() {
       />
 
       <ScrollView
-        style={styles.container}
+        style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={styles.contentContainer}
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor="#38bdf8"
-            colors={['#38bdf8']}
+            tintColor={colors.accent}
+            colors={[colors.accent]}
           />
         }
       >
@@ -140,7 +167,6 @@ export default function CityDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
   },
   contentContainer: {
     padding: 16,
@@ -149,18 +175,23 @@ const styles = StyleSheet.create({
   headerButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 8,
   },
-  unitButton: {
-    backgroundColor: '#334155',
+  iconButton: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#475569',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  unitButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
   },
   unitText: {
-    color: '#f8fafc',
     fontSize: 14,
     fontWeight: '700',
   },

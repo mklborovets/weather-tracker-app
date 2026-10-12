@@ -1,6 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 export interface ErrorStateProps {
   title?: string;
@@ -15,27 +16,31 @@ export function ErrorState({
   onRetry,
   isRetrying = false,
 }: ErrorStateProps) {
+  const { colors } = useThemeColors();
+
   return (
     <View style={styles.container}>
-      <View style={styles.iconCircle}>
-        <Ionicons name="alert-circle-outline" size={44} color="#f87171" />
+      <View
+        style={[styles.iconCircle, { backgroundColor: colors.card, borderColor: colors.border }]}
+      >
+        <Ionicons name="alert-circle-outline" size={44} color={colors.danger} />
       </View>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.message}>{message}</Text>
+      <Text style={[styles.title, { color: colors.textPrimary }]}>{title}</Text>
+      <Text style={[styles.message, { color: colors.textSecondary }]}>{message}</Text>
 
       {onRetry && (
         <TouchableOpacity
-          style={styles.retryButton}
+          style={[styles.retryButton, { backgroundColor: colors.accent }]}
           onPress={onRetry}
           disabled={isRetrying}
           activeOpacity={0.8}
           accessibilityLabel="Retry loading"
         >
           {isRetrying ? (
-            <ActivityIndicator size="small" color="#0f172a" />
+            <ActivityIndicator size="small" color="#ffffff" />
           ) : (
             <View style={styles.buttonContent}>
-              <Ionicons name="refresh" size={16} color="#0f172a" />
+              <Ionicons name="refresh" size={16} color="#ffffff" />
               <Text style={styles.buttonText}>Try Again</Text>
             </View>
           )}
@@ -56,9 +61,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: '#1e293b',
     borderWidth: 1,
-    borderColor: '#334155',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -66,20 +69,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#f8fafc',
     marginBottom: 8,
     textAlign: 'center',
   },
   message: {
     fontSize: 14,
-    color: '#94a3b8',
     textAlign: 'center',
     lineHeight: 20,
     maxWidth: 280,
     marginBottom: 24,
   },
   retryButton: {
-    backgroundColor: '#38bdf8',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 12,
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   buttonText: {
-    color: '#0f172a',
+    color: '#ffffff',
     fontSize: 15,
     fontWeight: '700',
   },
