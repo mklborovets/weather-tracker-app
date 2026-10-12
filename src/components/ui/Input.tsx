@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   View,
   ViewStyle,
-  Text,
 } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export interface InputProps extends TextInputProps {
   onClear?: () => void;
@@ -31,7 +31,7 @@ export function Input({
 
   return (
     <View style={[styles.container, containerStyle]}>
-      <Text style={styles.searchIcon}>🔍</Text>
+      <Ionicons name="search" size={18} color="#94a3b8" style={styles.searchIcon} />
       <TextInput
         value={value}
         onChangeText={onChangeText}
@@ -50,7 +50,7 @@ export function Input({
           style={styles.clearButton}
           accessibilityLabel="Clear text"
         >
-          <Text style={styles.clearText}>✕</Text>
+          <Ionicons name="close" size={14} color="#94a3b8" />
         </TouchableOpacity>
       )}
     </View>
@@ -69,7 +69,6 @@ const styles = StyleSheet.create({
     height: 50,
   },
   searchIcon: {
-    fontSize: 16,
     marginRight: 10,
   },
   input: {
@@ -82,7 +81,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   clearButton: {
-    padding: 4,
+    padding: 3,
     marginLeft: 6,
     borderRadius: 12,
     backgroundColor: '#334155',
@@ -90,11 +89,5 @@ const styles = StyleSheet.create({
     height: 22,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  clearText: {
-    color: '#94a3b8',
-    fontSize: 12,
-    fontWeight: '700',
-    lineHeight: 14,
   },
 });

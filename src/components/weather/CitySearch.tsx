@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Input } from '@/components/ui/Input';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCitySearch } from '@/hooks/useCitySearch';
@@ -84,7 +85,7 @@ export function CitySearch({
                     {[item.admin1, item.country].filter(Boolean).join(', ')}
                   </Text>
                 </View>
-                <Text style={styles.arrowIcon}>›</Text>
+                <Ionicons name="chevron-forward" size={18} color="#64748b" />
               </TouchableOpacity>
             )}
             ItemSeparatorComponent={() => <View style={styles.separator} />}

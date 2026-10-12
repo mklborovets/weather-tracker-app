@@ -28,6 +28,13 @@ export default function RootLayout() {
             title: 'Weather Tracker',
           }}
         />
+        <Stack.Screen
+          name="city/[id]"
+          options={{
+            title: 'Forecast',
+            headerBackTitle: 'Back',
+          }}
+        />
       </Stack>
     </QueryClientProvider>
   );
