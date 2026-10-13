@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   FlatList,
   Keyboard,
+  Platform,
   RefreshControl,
   StyleSheet,
   Text,
@@ -68,6 +69,81 @@ export default function HomeScreen() {
     }
   };
 
+  const content = (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.searchSection}>
+        <View style={styles.searchRow}>
+          <View style={styles.searchInputContainer}>
+            <CitySearch placeholder="Search city (e.g. Kyiv, London)..." />
+          </View>
+          <TouchableOpacity
+            style={[
+              styles.locationButton,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+            onPress={handleLocationPress}
+            disabled={isLocating}
+            activeOpacity={0.7}
+            accessibilityLabel="My current location"
+          >
+            {isLocating ? (
+              <ActivityIndicator size="small" color={colors.accent} />
+            ) : (
+              <Ionicons name="navigate-outline" size={20} color={colors.accent} />
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.sectionHeader}>
+        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Saved Cities</Text>
+        {favorites.length > 0 && (
+          <View style={[styles.badge, { backgroundColor: colors.card }]}>
+            <Text style={[styles.badgeText, { color: colors.accent }]}>{favorites.length}</Text>
+          </View>
+        )}
+      </View>
+
+      {favorites.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <View
+            style={[
+              styles.emptyIconCircle,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <Ionicons name="heart-outline" size={32} color={colors.textMuted} />
+          </View>
+          <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
+            No saved cities yet
+          </Text>
+          <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+            Search for a city above or tap the location button to view weather forecasts and save
+            your favorite places.
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={favorites}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => (
+            <FavoriteCityCard city={item} onPress={handleCityPress} onRemove={removeFavorite} />
+          )}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              tintColor={colors.accent}
+              colors={[colors.accent]}
+            />
+          }
+        />
+      )}
+    </View>
+  );
+
   return (
     <>
       <Stack.Screen
@@ -76,81 +152,13 @@ export default function HomeScreen() {
           headerRight: () => <HeaderControls />,
         }}
       />
-
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
-          <View style={styles.searchSection}>
-            <View style={styles.searchRow}>
-              <View style={styles.searchInputContainer}>
-                <CitySearch placeholder="Search city (e.g. Kyiv, London)..." />
-              </View>
-              <TouchableOpacity
-                style={[
-                  styles.locationButton,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                ]}
-                onPress={handleLocationPress}
-                disabled={isLocating}
-                activeOpacity={0.7}
-                accessibilityLabel="My current location"
-              >
-                {isLocating ? (
-                  <ActivityIndicator size="small" color={colors.accent} />
-                ) : (
-                  <Ionicons name="navigate-outline" size={20} color={colors.accent} />
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Saved Cities</Text>
-            {favorites.length > 0 && (
-              <View style={[styles.badge, { backgroundColor: colors.card }]}>
-                <Text style={[styles.badgeText, { color: colors.accent }]}>{favorites.length}</Text>
-              </View>
-            )}
-          </View>
-
-          {favorites.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <View
-                style={[
-                  styles.emptyIconCircle,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                ]}
-              >
-                <Ionicons name="heart-outline" size={32} color={colors.textMuted} />
-              </View>
-              <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
-                No saved cities yet
-              </Text>
-              <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-                Search for a city above or tap the location button to view weather forecasts and
-                save your favorite places.
-              </Text>
-            </View>
-          ) : (
-            <FlatList
-              data={favorites}
-              keyExtractor={(item) => String(item.id)}
-              renderItem={({ item }) => (
-                <FavoriteCityCard city={item} onPress={handleCityPress} onRemove={removeFavorite} />
-              )}
-              contentContainerStyle={styles.listContent}
-              showsVerticalScrollIndicator={false}
-              refreshControl={
-                <RefreshControl
-                  refreshing={isRefreshing}
-                  onRefresh={handleRefresh}
-                  tintColor={colors.accent}
-                  colors={[colors.accent]}
-                />
-              }
-            />
-          )}
-        </View>
-      </TouchableWithoutFeedback>
+      {Platform.OS === 'web' ? (
+        content
+      ) : (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          {content}
+        </TouchableWithoutFeedback>
+      )}
     </>
   );
 }

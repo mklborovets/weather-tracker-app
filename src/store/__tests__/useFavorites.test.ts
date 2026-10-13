@@ -53,7 +53,7 @@ describe('useFavorites store', () => {
 
     useFavorites.getState().addFavorite(sampleCity1);
     expect(useFavorites.getState().isFavorite(1)).toBe(true);
-    expect(useFavorites.getState().isFavorite('1')).toBe(true); // handles string/number id comparison
+    expect(useFavorites.getState().isFavorite('1')).toBe(true);
     expect(useFavorites.getState().isFavorite(2)).toBe(false);
   });
 });

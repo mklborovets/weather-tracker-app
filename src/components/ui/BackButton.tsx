@@ -15,8 +15,10 @@ export function BackButton({ onPress }: BackButtonProps) {
   const handlePress = () => {
     if (onPress) {
       onPress();
-    } else {
+    } else if (router.canGoBack()) {
       router.back();
+    } else {
+      router.replace('/');
     }
   };
 

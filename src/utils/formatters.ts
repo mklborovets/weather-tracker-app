@@ -72,3 +72,18 @@ export function formatTimeAgo(isoDateString?: string): string {
     return '';
   }
 }
+
+export function cleanCityName(rawName?: string | null): string {
+  if (!rawName) return 'Current Location';
+
+  let cleaned = rawName.trim();
+
+  cleaned = cleaned
+    .replace(
+      /\s+(urban\s+hromada|hromada|raion|district|municipality|city\s+council|міська\s+громада|громада|район|міськрада)$/i,
+      '',
+    )
+    .trim();
+
+  return cleaned || 'Current Location';
+}
