@@ -1,44 +1,44 @@
 import { getWeatherInfo } from '@/utils/weatherCodes';
 
 describe('weatherCodes', () => {
-  it('maps WMO code 0 to Clear sky', () => {
-    const info = getWeatherInfo(0);
-    expect(info.label).toBe('Clear sky');
-    expect(info.iconName).toBe('sunny');
+  it.each([
+    [0, 'Clear sky', 'sunny'],
+    [1, 'Mainly clear', 'sunny-outline'],
+    [2, 'Partly cloudy', 'partly-sunny'],
+    [3, 'Overcast', 'cloudy'],
+    [45, 'Foggy', 'cloud-outline'],
+    [48, 'Foggy', 'cloud-outline'],
+    [51, 'Drizzle', 'rainy-outline'],
+    [53, 'Drizzle', 'rainy-outline'],
+    [55, 'Drizzle', 'rainy-outline'],
+    [56, 'Freezing Drizzle', 'snow-outline'],
+    [57, 'Freezing Drizzle', 'snow-outline'],
+    [61, 'Slight rain', 'rainy-outline'],
+    [63, 'Moderate rain', 'rainy'],
+    [65, 'Heavy rain', 'rainy'],
+    [66, 'Freezing rain', 'snow-outline'],
+    [67, 'Freezing rain', 'snow-outline'],
+    [71, 'Slight snow', 'snow-outline'],
+    [73, 'Moderate snow', 'snow'],
+    [75, 'Heavy snow', 'snow'],
+    [77, 'Heavy snow', 'snow'],
+    [80, 'Rain showers', 'rainy'],
+    [81, 'Rain showers', 'rainy'],
+    [82, 'Rain showers', 'rainy'],
+    [85, 'Snow showers', 'snow'],
+    [86, 'Snow showers', 'snow'],
+    [95, 'Thunderstorm', 'thunderstorm'],
+    [96, 'Thunderstorm with hail', 'thunderstorm'],
+    [99, 'Thunderstorm with hail', 'thunderstorm'],
+  ])('maps WMO code %i to "%s" with %s icon', (code, label, iconName) => {
+    const info = getWeatherInfo(code);
+    expect(info.label).toBe(label);
+    expect(info.iconName).toBe(iconName);
+    expect(info.iconColor).toMatch(/^#[0-9a-f]{6}$/i);
   });
 
-  it('maps WMO code 2 to Partly cloudy', () => {
-    const info = getWeatherInfo(2);
-    expect(info.label).toBe('Partly cloudy');
-    expect(info.iconName).toBe('partly-sunny');
-  });
-
-  it('maps WMO code 3 to Overcast', () => {
-    const info = getWeatherInfo(3);
-    expect(info.label).toBe('Overcast');
-    expect(info.iconName).toBe('cloudy');
-  });
-
-  it('maps WMO code 61 to Slight rain', () => {
-    const info = getWeatherInfo(61);
-    expect(info.label).toBe('Slight rain');
-    expect(info.iconName).toBe('rainy-outline');
-  });
-
-  it('maps WMO code 71 to Slight snow', () => {
-    const info = getWeatherInfo(71);
-    expect(info.label).toBe('Slight snow');
-    expect(info.iconName).toBe('snow-outline');
-  });
-
-  it('maps WMO code 95 to Thunderstorm', () => {
-    const info = getWeatherInfo(95);
-    expect(info.label).toBe('Thunderstorm');
-    expect(info.iconName).toBe('thunderstorm');
-  });
-
-  it('falls back to Variable for unknown WMO code', () => {
-    const info = getWeatherInfo(999);
+  it.each([-1, 4, 999])('falls back to "Variable" for unknown code %i', (code) => {
+    const info = getWeatherInfo(code);
     expect(info.label).toBe('Variable');
     expect(info.iconName).toBe('partly-sunny-outline');
   });

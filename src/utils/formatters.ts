@@ -50,6 +50,7 @@ export function formatTimeAgo(isoDateString?: string): string {
   if (!isoDateString) return '';
   try {
     const updatedTime = new Date(isoDateString).getTime();
+    if (Number.isNaN(updatedTime)) return '';
     const now = Date.now();
     const diffMinutes = Math.max(0, Math.floor((now - updatedTime) / 60000));
 

@@ -17,4 +17,20 @@ module.exports = {
       },
     ],
   },
+  collectCoverageFrom: [
+    'src/api/**/*.ts',
+    'src/store/**/*.ts',
+    'src/utils/**/*.ts',
+    '!src/**/__tests__/**',
+  ],
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'text-summary', 'html', 'lcov'],
+  coverageThreshold: {
+    global: {
+      statements: 90,
+      branches: 90,
+      functions: 90,
+      lines: 90,
+    },
+  },
 };

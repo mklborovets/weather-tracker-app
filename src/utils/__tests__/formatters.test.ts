@@ -3,6 +3,8 @@ import {
   formatTemperature,
   formatWindSpeed,
   formatTimeAgo,
+  formatDayOfWeek,
+  formatShortDate,
 } from '@/utils/formatters';
 
 describe('formatters', () => {
@@ -47,10 +49,37 @@ describe('formatters', () => {
     });
   });
 
+  describe('formatDayOfWeek', () => {
+    const toIsoDate = (date: Date) =>
+      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+        date.getDate(),
+      ).padStart(2, '0')}`;
+
+    it('returns "Today" for the current date', () => {
+      expect(formatDayOfWeek(toIsoDate(new Date()))).toBe('Today');
+    });
+
+    it('returns short weekday name for other dates', () => {
+
+      expect(formatDayOfWeek('2026-10-15')).toBe('Thu');
+    });
+  });
+
+  describe('formatShortDate', () => {
+    it('formats YYYY-MM-DD as short month and day', () => {
+      expect(formatShortDate('2026-10-15')).toBe('Oct 15');
+      expect(formatShortDate('2026-01-03')).toBe('Jan 3');
+    });
+  });
+
   describe('formatTimeAgo', () => {
     it('returns empty string if isoDateString is missing', () => {
       expect(formatTimeAgo(undefined)).toBe('');
       expect(formatTimeAgo('')).toBe('');
+    });
+
+    it('returns empty string for invalid date strings', () => {
+      expect(formatTimeAgo('not-a-date')).toBe('');
     });
 
     it('returns "just now" for timestamp under 1 minute', () => {

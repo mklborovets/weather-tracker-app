@@ -33,3 +33,5 @@ yarn-error.log*
 
 ObsidianNotes/
 Steps.md
+# test coverage
+coverage/
