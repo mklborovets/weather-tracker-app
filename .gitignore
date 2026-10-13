@@ -35,3 +35,5 @@ ObsidianNotes/
 Steps.md
 # test coverage
 coverage/
+
+.vscode/
