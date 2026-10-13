@@ -5,6 +5,7 @@ import {
   formatTimeAgo,
   formatDayOfWeek,
   formatShortDate,
+  cleanCityName,
 } from '@/utils/formatters';
 
 describe('formatters', () => {
@@ -62,6 +63,12 @@ describe('formatters', () => {
     it('returns short weekday name for other dates', () => {
       expect(formatDayOfWeek('2026-10-15')).toBe('Thu');
     });
+
+    it('handles empty or malformed date strings safely', () => {
+      expect(formatDayOfWeek('')).toBe('');
+      expect(formatDayOfWeek('invalid')).toBe('invalid');
+      expect(formatDayOfWeek('2026-abc-01')).toBe('2026-abc-01');
+    });
   });
 
   describe('formatShortDate', () => {
@@ -104,6 +111,38 @@ describe('formatters', () => {
     it('returns formatted hours for multiple hours', () => {
       const threeHoursAgo = new Date(Date.now() - 3 * 3600 * 1000).toISOString();
       expect(formatTimeAgo(threeHoursAgo)).toBe('3 hours ago');
+    });
+
+    it('returns "1 day ago" for 24-47 hours elapsed', () => {
+      const oneDayAgo = new Date(Date.now() - 25 * 3600 * 1000).toISOString();
+      expect(formatTimeAgo(oneDayAgo)).toBe('1 day ago');
+    });
+
+    it('returns "X days ago" for 48+ hours elapsed', () => {
+      const twoDaysAgo = new Date(Date.now() - 49 * 3600 * 1000).toISOString();
+      expect(formatTimeAgo(twoDaysAgo)).toBe('2 days ago');
+    });
+  });
+
+  describe('cleanCityName', () => {
+    it('returns "Current Location" when rawName is missing or empty', () => {
+      expect(cleanCityName(undefined)).toBe('Current Location');
+      expect(cleanCityName(null)).toBe('Current Location');
+      expect(cleanCityName('')).toBe('Current Location');
+      expect(cleanCityName('   ')).toBe('Current Location');
+    });
+
+    it('removes administrative suffixes from city names', () => {
+      expect(cleanCityName('Kyiv urban hromada')).toBe('Kyiv');
+      expect(cleanCityName('Lviv hromada')).toBe('Lviv');
+      expect(cleanCityName('Brovary raion')).toBe('Brovary');
+      expect(cleanCityName('Dnipro міська громада')).toBe('Dnipro');
+      expect(cleanCityName('Odesa район')).toBe('Odesa');
+    });
+
+    it('preserves clean city names as-is', () => {
+      expect(cleanCityName('London')).toBe('London');
+      expect(cleanCityName('Kyiv')).toBe('Kyiv');
     });
   });
 });

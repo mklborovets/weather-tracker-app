@@ -11,6 +11,16 @@ export interface LocationResult {
   admin1?: string;
 }
 
+function showLocationAlert(title: string, message: string) {
+  if (Platform.OS === 'web') {
+    if (typeof window !== 'undefined' && typeof window.alert === 'function') {
+      window.alert(`${title}: ${message}`);
+    }
+  } else {
+    Alert.alert(title, message, [{ text: 'OK' }]);
+  }
+}
+
 export function useLocation() {
   const [isLocating, setIsLocating] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -71,7 +81,7 @@ export function useLocation() {
           const message =
             'Location permission was denied. Please allow location access in your device settings to get weather for your current location.';
           setErrorMsg(message);
-          Alert.alert('Location Permission Required', message, [{ text: 'OK' }]);
+          showLocationAlert('Location Permission Required', message);
           return null;
         }
 
@@ -105,28 +115,20 @@ export function useLocation() {
       try {
         if (Platform.OS === 'web') {
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`,
-            { headers: { 'Accept-Language': 'en' } },
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
           );
           if (res.ok) {
             const data = (await res.json()) as {
-              address?: {
-                city?: string;
-                town?: string;
-                village?: string;
-                municipality?: string;
-                state?: string;
-                country?: string;
-              };
+              city?: string;
+              locality?: string;
+              principalSubdivision?: string;
+              countryName?: string;
             };
-            const addr = data.address;
-            if (addr) {
-              cityName = cleanCityName(
-                addr.city || addr.town || addr.village || addr.municipality || 'Current Location',
-              );
-              country = addr.country;
-              admin1 = addr.state;
-            }
+            cityName = cleanCityName(
+              data.city || data.locality || data.principalSubdivision || 'Current Location',
+            );
+            country = data.countryName;
+            admin1 = data.principalSubdivision;
           }
         } else {
           const reverse = await Location.reverseGeocodeAsync({
@@ -168,7 +170,7 @@ export function useLocation() {
         }
       }
       setErrorMsg(message);
-      Alert.alert('Location Error', message, [{ text: 'OK' }]);
+      showLocationAlert('Location Error', message);
       return null;
     } finally {
       setIsLocating(false);

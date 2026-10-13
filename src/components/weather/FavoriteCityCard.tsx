@@ -33,33 +33,33 @@ export function FavoriteCityCard({ city, onPress, onRemove }: FavoriteCityCardPr
   const locationSubtitle = [city.admin1, city.country].filter(Boolean).join(', ');
 
   return (
-    <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
-      onPress={() => onPress(city)}
-      activeOpacity={0.7}
-      accessibilityRole="button"
-      accessibilityLabel={`Weather for ${city.name}`}
-    >
-      <View style={styles.leftContainer}>
-        <Text style={[styles.cityName, { color: colors.textPrimary }]} numberOfLines={1}>
-          {city.name}
-        </Text>
-        {locationSubtitle ? (
-          <Text
-            style={[styles.locationSubtitle, { color: colors.textSecondary }]}
-            numberOfLines={1}
-          >
-            {locationSubtitle}
+    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <TouchableOpacity
+        style={styles.contentButton}
+        onPress={() => onPress(city)}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={`Weather for ${city.name}`}
+      >
+        <View style={styles.leftContainer}>
+          <Text style={[styles.cityName, { color: colors.textPrimary }]} numberOfLines={1}>
+            {city.name}
           </Text>
-        ) : null}
-        {condition ? (
-          <Text style={[styles.conditionText, { color: colors.accent }]} numberOfLines={1}>
-            {condition.label}
-          </Text>
-        ) : null}
-      </View>
+          {locationSubtitle ? (
+            <Text
+              style={[styles.locationSubtitle, { color: colors.textSecondary }]}
+              numberOfLines={1}
+            >
+              {locationSubtitle}
+            </Text>
+          ) : null}
+          {condition ? (
+            <Text style={[styles.conditionText, { color: colors.accent }]} numberOfLines={1}>
+              {condition.label}
+            </Text>
+          ) : null}
+        </View>
 
-      <View style={styles.rightContainer}>
         <View style={styles.weatherInfo}>
           {isLoading && (
             <ActivityIndicator size="small" color={colors.accent} style={styles.loader} />
@@ -78,23 +78,25 @@ export function FavoriteCityCard({ city, onPress, onRemove }: FavoriteCityCardPr
             </View>
           )}
         </View>
+      </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.removeButton,
-            {
-              backgroundColor: colors.cardSecondary,
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={() => onRemove(city.id)}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          accessibilityLabel={`Remove ${city.name} from favorites`}
-        >
-          <Ionicons name="trash-outline" size={18} color={colors.textMuted} />
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.removeButton,
+          {
+            backgroundColor: colors.cardSecondary,
+            borderColor: colors.border,
+          },
+        ]}
+        onPress={() => onRemove(city.id)}
+        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={`Remove ${city.name} from favorites`}
+      >
+        <Ionicons name="trash-outline" size={18} color={colors.textMuted} />
+      </TouchableOpacity>
+    </View>
   );
 }
 
@@ -106,7 +108,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  contentButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
+    marginRight: 12,
   },
   leftContainer: {
     flex: 1,
@@ -125,11 +133,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '500',
   },
-  rightContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
   weatherInfo: {
     alignItems: 'flex-end',
     minWidth: 70,
@@ -147,8 +150,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   removeButton: {
-    padding: 6,
+    padding: 8,
     borderRadius: 8,
     borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

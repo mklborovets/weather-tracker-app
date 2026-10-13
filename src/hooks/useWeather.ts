@@ -23,8 +23,10 @@ export function useWeather({
     !Number.isNaN(latitude) &&
     !Number.isNaN(longitude);
 
+  const normalizedCityId = cityId !== undefined && cityId !== null ? String(cityId) : undefined;
+
   return useQuery<WeatherData, Error>({
-    queryKey: ['weather', latitude, longitude, cityName, cityId],
+    queryKey: ['weather', latitude, longitude, cityName, normalizedCityId],
     queryFn: () => getWeatherForecast(latitude!, longitude!, cityName, cityId),
     enabled: enabled && hasCoordinates,
     staleTime: 1000 * 60 * 10, // 10 minutes

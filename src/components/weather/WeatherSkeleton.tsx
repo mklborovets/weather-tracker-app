@@ -34,10 +34,12 @@ export function WeatherSkeleton() {
         style={[styles.forecastCard, { backgroundColor: colors.card, borderColor: colors.border }]}
       >
         {[1, 2, 3, 4, 5].map((item, index) => (
-          <View key={item} style={styles.forecastRow}>
-            <Skeleton width={70} height={18} borderRadius={6} />
-            <Skeleton width={26} height={26} borderRadius={13} />
-            <Skeleton width={80} height={18} borderRadius={6} />
+          <View key={item}>
+            <View style={styles.forecastRow}>
+              <Skeleton width={70} height={18} borderRadius={6} />
+              <Skeleton width={26} height={26} borderRadius={13} />
+              <Skeleton width={80} height={18} borderRadius={6} />
+            </View>
             {index < 4 && <View style={[styles.divider, { backgroundColor: colors.border }]} />}
           </View>
         ))}

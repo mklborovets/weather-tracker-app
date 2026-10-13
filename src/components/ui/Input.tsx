@@ -48,12 +48,14 @@ export function Input({
         style={[styles.input, { color: colors.textPrimary }, style]}
         autoCorrect={false}
         autoCapitalize="none"
+        returnKeyType="search"
+        accessibilityRole="search"
         {...props}
       />
       {isLoading && (
         <ActivityIndicator size="small" color={colors.accent} style={styles.indicator} />
       )}
-      {showClear && !isLoading && (
+      {showClear && (
         <TouchableOpacity
           onPress={onClear}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}

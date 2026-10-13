@@ -35,11 +35,21 @@ export async function fetchJson<T>(
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new ApiError(
-        `API request failed with status ${response.status}: ${response.statusText}`,
-        response.status,
-        errorText,
-      );
+      let errorReason = response.statusText;
+      try {
+        const parsed = JSON.parse(errorText) as { reason?: string; message?: string };
+        if (parsed?.reason) {
+          errorReason = parsed.reason;
+        } else if (parsed?.message) {
+          errorReason = parsed.message;
+        }
+      } catch {}
+
+      const message = errorReason
+        ? `API request failed with status ${response.status}: ${errorReason}`
+        : `API request failed with status ${response.status}`;
+
+      throw new ApiError(message, response.status, errorText);
     }
 
     const data: T = await response.json();

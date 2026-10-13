@@ -55,6 +55,30 @@ describe('fetchJson client', () => {
     }
   });
 
+  it('extracts reason or message from JSON error response', async () => {
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      statusText: '',
+      text: jest.fn().mockResolvedValue(JSON.stringify({ reason: 'Invalid coordinates' })),
+    });
+
+    await expect(fetchJson('https://example.com', '/v1/weather')).rejects.toThrow(
+      'API request failed with status 400: Invalid coordinates',
+    );
+
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 429,
+      statusText: '',
+      text: jest.fn().mockResolvedValue(JSON.stringify({ message: 'Too many requests' })),
+    });
+
+    await expect(fetchJson('https://example.com', '/v1/weather')).rejects.toThrow(
+      'API request failed with status 429: Too many requests',
+    );
+  });
+
   it('throws ApiError with statusCode 0 on network failures', async () => {
     global.fetch = jest.fn().mockRejectedValue(new Error('Failed to connect'));
 

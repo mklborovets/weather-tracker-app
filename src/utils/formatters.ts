@@ -16,8 +16,13 @@ export function formatWindSpeed(kmh: number): string {
 }
 
 export function formatDayOfWeek(dateString: string): string {
+  if (!dateString || typeof dateString !== 'string') return '';
   try {
-    const [year, month, day] = dateString.split('-').map(Number);
+    const parts = dateString.split('-');
+    if (parts.length !== 3) return dateString;
+    const [year, month, day] = parts.map(Number);
+    if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) return dateString;
+
     const date = new Date(year, month - 1, day);
     const today = new Date();
 
@@ -37,8 +42,13 @@ export function formatDayOfWeek(dateString: string): string {
 }
 
 export function formatShortDate(dateString: string): string {
+  if (!dateString || typeof dateString !== 'string') return '';
   try {
-    const [year, month, day] = dateString.split('-').map(Number);
+    const parts = dateString.split('-');
+    if (parts.length !== 3) return dateString;
+    const [year, month, day] = parts.map(Number);
+    if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) return dateString;
+
     const date = new Date(year, month - 1, day);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   } catch {
@@ -67,7 +77,14 @@ export function formatTimeAgo(isoDateString?: string): string {
     if (diffHours === 1) {
       return '1 hour ago';
     }
-    return `${diffHours} hours ago`;
+    if (diffHours < 24) {
+      return `${diffHours} hours ago`;
+    }
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) {
+      return '1 day ago';
+    }
+    return `${diffDays} days ago`;
   } catch {
     return '';
   }

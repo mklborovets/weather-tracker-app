@@ -44,7 +44,7 @@ export function CitySearch({
   };
 
   const hasSearchText = query.trim().length > 0;
-  const isSearching = debouncedQuery.trim().length >= 2;
+  const isSearching = query.trim().length >= 2 && debouncedQuery.trim().length >= 2;
   const showEmptyState = isSearching && !isLoading && !isError && results && results.length === 0;
 
   return (
@@ -101,8 +101,13 @@ export function CitySearch({
                 activeOpacity={0.7}
               >
                 <View style={styles.resultTextContainer}>
-                  <Text style={[styles.cityName, { color: colors.textPrimary }]}>{item.name}</Text>
-                  <Text style={[styles.cityDetails, { color: colors.textSecondary }]}>
+                  <Text style={[styles.cityName, { color: colors.textPrimary }]} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  <Text
+                    style={[styles.cityDetails, { color: colors.textSecondary }]}
+                    numberOfLines={1}
+                  >
                     {[item.admin1, item.country].filter(Boolean).join(', ')}
                   </Text>
                 </View>
@@ -126,10 +131,19 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   feedbackContainer: {
-    marginTop: 8,
+    position: 'absolute',
+    top: 56,
+    left: 0,
+    right: 0,
     padding: 12,
-    borderRadius: 10,
+    borderRadius: 12,
     borderWidth: 1,
+    zIndex: 100,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
   },
   errorText: {
     fontSize: 14,
@@ -140,11 +154,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   resultsWrapper: {
-    marginTop: 8,
+    position: 'absolute',
+    top: 56,
+    left: 0,
+    right: 0,
     borderRadius: 14,
     borderWidth: 1,
     maxHeight: 280,
     overflow: 'hidden',
+    zIndex: 100,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
   },
   resultsList: {
     width: '100%',

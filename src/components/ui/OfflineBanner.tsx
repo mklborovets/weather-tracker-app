@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatTimeAgo } from '@/utils/formatters';
 
 export interface OfflineBannerProps {
@@ -9,23 +10,37 @@ export interface OfflineBannerProps {
 }
 
 export function OfflineBanner({ lastUpdated, onRefresh }: OfflineBannerProps) {
+  const { colors, isDark } = useThemeColors();
   const timeText = lastUpdated ? formatTimeAgo(lastUpdated) : 'recently';
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark ? colors.card : '#fef3c7',
+          borderColor: colors.warning,
+        },
+      ]}
+    >
       <View style={styles.leftContent}>
-        <Ionicons name="cloud-offline-outline" size={18} color="#f59e0b" />
-        <Text style={styles.bannerText}>Offline mode • Updated {timeText}</Text>
+        <Ionicons name="cloud-offline-outline" size={18} color={colors.warning} />
+        <Text style={[styles.bannerText, { color: isDark ? colors.warning : '#92400e' }]}>
+          Offline mode • Updated {timeText}
+        </Text>
       </View>
 
       {onRefresh && (
         <TouchableOpacity
           onPress={onRefresh}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          style={styles.refreshButton}
+          style={[
+            styles.refreshButton,
+            { backgroundColor: isDark ? colors.cardSecondary : '#fde68a' },
+          ]}
           accessibilityLabel="Retry connection"
         >
-          <Ionicons name="refresh" size={14} color="#f59e0b" />
+          <Ionicons name="refresh" size={14} color={isDark ? colors.warning : '#92400e'} />
         </TouchableOpacity>
       )}
     </View>
@@ -37,9 +52,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#1e293b',
     borderWidth: 1,
-    borderColor: '#d97706',
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 14,
@@ -52,13 +65,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bannerText: {
-    color: '#fbbf24',
     fontSize: 13,
     fontWeight: '600',
   },
   refreshButton: {
-    padding: 4,
+    padding: 6,
     borderRadius: 6,
-    backgroundColor: '#292524',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

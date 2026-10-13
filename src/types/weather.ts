@@ -56,6 +56,7 @@ export interface WeatherData {
   longitude: number;
   timezone: string;
   lastUpdated: string;
+  isOffline?: boolean;
   current: {
     temperature: number;
     apparentTemperature: number;

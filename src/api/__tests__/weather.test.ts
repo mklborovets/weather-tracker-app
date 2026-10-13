@@ -112,9 +112,38 @@ describe('weather API', () => {
       expect(result.daily).toHaveLength(2);
     });
 
-    it('propagates API errors', async () => {
+    it('propagates API errors when no cached data exists', async () => {
       mockedFetchJson.mockRejectedValue(new Error('Network error'));
-      await expect(getWeatherForecast(0, 0)).rejects.toThrow('Network error');
+      await expect(getWeatherForecast(99.9, 99.9)).rejects.toThrow('Network error');
+    });
+
+    it('returns cached data with isOffline flag when network fails', async () => {
+      mockedFetchJson.mockResolvedValueOnce(rawFixture);
+      await getWeatherForecast(50.45, 30.52, 'Kyiv', 1);
+
+      mockedFetchJson.mockRejectedValueOnce(new Error('Network offline'));
+      const cachedResult = await getWeatherForecast(50.45, 30.52, 'Kyiv', 1);
+
+      expect(cachedResult.isOffline).toBe(true);
+      expect(cachedResult.cityName).toBe('Kyiv');
+      expect(cachedResult.current.temperature).toBe(13);
+
+      mockedFetchJson.mockRejectedValueOnce(new Error('Network offline'));
+      const fallbackDefaults = await getWeatherForecast(50.45, 30.52);
+      expect(fallbackDefaults.cityName).toBe('Kyiv');
+      expect(fallbackDefaults.cityId).toBe(1);
+    });
+
+    it('handles empty current and daily fields without throwing', () => {
+      const minimalRaw = {
+        latitude: 10,
+        longitude: 20,
+        timezone: 'UTC',
+      } as unknown as OpenMeteoForecastResponse;
+
+      const result = transformForecastResponse(minimalRaw);
+      expect(result.current.temperature).toBe(0);
+      expect(result.daily).toEqual([]);
     });
   });
 });

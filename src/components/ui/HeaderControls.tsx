@@ -20,6 +20,7 @@ export function HeaderControls() {
     >
       <TouchableOpacity
         onPress={toggleTheme}
+        hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
         style={styles.itemButton}
         activeOpacity={0.7}
         accessibilityRole="button"
@@ -36,6 +37,7 @@ export function HeaderControls() {
 
       <TouchableOpacity
         onPress={toggleTemperatureUnit}
+        hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
         style={styles.itemButton}
         activeOpacity={0.7}
         accessibilityRole="button"

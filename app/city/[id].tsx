@@ -24,10 +24,15 @@ export default function CityDetailsScreen() {
     admin1?: string;
   }>();
 
-  const cityId = params.id;
+  const rawLat = params.latitude !== undefined ? parseFloat(params.latitude) : null;
+  const rawLon = params.longitude !== undefined ? parseFloat(params.longitude) : null;
+  const hasValidCoordinates =
+    rawLat !== null && rawLon !== null && !Number.isNaN(rawLat) && !Number.isNaN(rawLon);
+
+  const latitude = hasValidCoordinates ? rawLat : null;
+  const longitude = hasValidCoordinates ? rawLon : null;
+  const cityId = params.id || (hasValidCoordinates ? `loc_${latitude}_${longitude}` : '');
   const cityName = params.name || 'City Weather';
-  const latitude = params.latitude ? parseFloat(params.latitude) : null;
-  const longitude = params.longitude ? parseFloat(params.longitude) : null;
   const country = params.country;
   const admin1 = params.admin1;
 
@@ -35,7 +40,7 @@ export default function CityDetailsScreen() {
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const { colors } = useThemeColors();
 
-  const isFav = isFavorite(cityId);
+  const isFav = Boolean(cityId && isFavorite(cityId));
 
   const {
     data: weather,
@@ -49,12 +54,14 @@ export default function CityDetailsScreen() {
     longitude,
     cityName,
     cityId,
+    enabled: hasValidCoordinates,
   });
 
   const handleToggleFavorite = () => {
+    if (!cityId) return;
     if (isFav) {
       removeFavorite(cityId);
-    } else if (latitude !== null && longitude !== null) {
+    } else if (hasValidCoordinates && latitude !== null && longitude !== null) {
       addFavorite({
         id: cityId,
         name: cityName,
@@ -66,7 +73,7 @@ export default function CityDetailsScreen() {
     }
   };
 
-  const isOfflineData = isError && Boolean(weather);
+  const isOfflineData = Boolean(weather?.isOffline || (isError && weather));
 
   return (
     <>
@@ -83,11 +90,13 @@ export default function CityDetailsScreen() {
               <HeaderControls />
               <TouchableOpacity
                 onPress={handleToggleFavorite}
+                disabled={!hasValidCoordinates}
                 style={[
                   styles.favButton,
                   {
                     backgroundColor: colors.card,
                     borderColor: isFav ? colors.danger : colors.border,
+                    opacity: hasValidCoordinates ? 1 : 0.5,
                   },
                 ]}
                 activeOpacity={0.7}
@@ -117,9 +126,16 @@ export default function CityDetailsScreen() {
           />
         }
       >
-        {isLoading && !weather && <WeatherSkeleton />}
+        {!hasValidCoordinates && (
+          <ErrorState
+            title="Location Unavailable"
+            message="No valid geographic coordinates were provided for this location."
+          />
+        )}
 
-        {isError && !weather && (
+        {hasValidCoordinates && isLoading && !weather && <WeatherSkeleton />}
+
+        {hasValidCoordinates && isError && !weather && (
           <ErrorState
             title="Failed to Load Forecast"
             message={

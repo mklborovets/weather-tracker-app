@@ -24,8 +24,8 @@ import { FavoriteCity } from '@/types/favorites';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { favorites, removeFavorite } = useFavorites();
-  const { getCurrentLocation, isLocating } = useLocation();
+  const { favorites, removeFavorite, hasHydrated } = useFavorites();
+  const { getCurrentLocation, isLocating, errorMsg } = useLocation();
   const { colors } = useThemeColors();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -95,6 +95,15 @@ export default function HomeScreen() {
         </View>
       </View>
 
+      {errorMsg ? (
+        <View
+          style={[styles.errorBanner, { backgroundColor: colors.card, borderColor: colors.danger }]}
+        >
+          <Ionicons name="warning-outline" size={16} color={colors.danger} />
+          <Text style={[styles.errorBannerText, { color: colors.danger }]}>{errorMsg}</Text>
+        </View>
+      ) : null}
+
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Saved Cities</Text>
         {favorites.length > 0 && (
@@ -104,7 +113,11 @@ export default function HomeScreen() {
         )}
       </View>
 
-      {favorites.length === 0 ? (
+      {!hasHydrated ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color={colors.accent} />
+        </View>
+      ) : favorites.length === 0 ? (
         <View style={styles.emptyContainer}>
           <View
             style={[
@@ -131,6 +144,8 @@ export default function HomeScreen() {
           )}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
@@ -237,5 +252,25 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 24,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 40,
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    padding: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 16,
+  },
+  errorBannerText: {
+    fontSize: 13,
+    flex: 1,
+    lineHeight: 18,
   },
 });

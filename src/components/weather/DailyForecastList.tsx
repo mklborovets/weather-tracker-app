@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     justifyContent: 'flex-end',
-    width: 100,
+    minWidth: 80,
   },
   maxTemp: {
     fontSize: 16,
