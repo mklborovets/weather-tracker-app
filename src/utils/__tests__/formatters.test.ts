@@ -60,7 +60,6 @@ describe('formatters', () => {
     });
 
     it('returns short weekday name for other dates', () => {
-
       expect(formatDayOfWeek('2026-10-15')).toBe('Thu');
     });
   });
